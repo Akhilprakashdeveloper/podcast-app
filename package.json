@@ -56,6 +56,7 @@
     "react-i18next": "^15.0.1",
     "react-native": "0.76.9",
     "react-native-drawer-layout": "^4.0.1",
+    "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-keyboard-controller": "^1.12.7",
     "react-native-mmkv": "^2.12.2",
@@ -65,10 +66,10 @@
     "react-native-web": "~0.19.6"
   },
   "devDependencies": {
-    "@react-native-community/cli": "latest",
     "@babel/core": "^7.20.0",
     "@babel/preset-env": "^7.20.0",
     "@babel/runtime": "^7.20.0",
+    "@react-native-community/cli": "latest",
     "@testing-library/react-native": "^12.5.2",
     "@types/jest": "^29.2.1",
     "@types/react": "~18.3.12",

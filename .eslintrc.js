@@ -12,6 +12,8 @@ module.exports = {
   ],
   plugins: ["reactotron", "prettier"],
   rules: {
+    "react-native/no-color-literals": "off",
+    "import/export": "off",
     "prettier/prettier": "error",
     // typescript-eslint
     "@typescript-eslint/array-type": 0,
