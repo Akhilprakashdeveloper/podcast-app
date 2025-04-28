@@ -5,10 +5,7 @@ export interface Podcast {
   imageUrl: string
 }
 export interface PodcastItemProps {
-  id: string
-  title: string
-  channel: string
-  imageUrl: string
+  item: Podcast
   isSelected: boolean
-  onToggleSelect: (id: string) => void
+  onToggleSelect: (item: Podcast) => void
 }

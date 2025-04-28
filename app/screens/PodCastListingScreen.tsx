@@ -1,10 +1,13 @@
-import { useState, useCallback } from "react"
+import { useCallback } from "react"
 import { FlatList, SafeAreaView, Text, View, StyleSheet } from "react-native"
 
 import PodcastRenderItem from "@/components/PodcastRenderItem"
 import { Podcast } from "@/types/types"
 import { HEIGHT, WIDTH } from "@/constants/dimensions"
 import { colors } from "@/theme"
+import { useStores } from "@/models"
+import { observer } from "mobx-react-lite"
+import FloatingButton from "@/components/FloatingButton"
 
 const dummyPodcasts: Podcast[] = new Array(120).fill(null).map((_, index) => ({
   id: `podcast-${index}`,
@@ -13,32 +16,34 @@ const dummyPodcasts: Podcast[] = new Array(120).fill(null).map((_, index) => ({
   imageUrl: "https://picsum.photos/200", // Loading from remote url
 }))
 
-export const PodcastListingScreen = () => {
-  const [selectedIds, setSelectedIds] = useState<string[]>([])
+export const PodcastListingScreen = observer(() => {
+  const { selectedPodcastsStore } = useStores()
+  const selectedPodcasts = selectedPodcastsStore.selectedPodcasts
 
-  const toggleSelect = useCallback((id: string) => {
-    setSelectedIds((prev) => {
-      if (prev.includes(id)) {
-        return prev.filter((existingId) => existingId !== id)
+  const toggleSelect = useCallback(
+    (item: Podcast) => {
+      if (selectedPodcasts.some((selectedItem) => selectedItem.id === item.id)) {
+        // If the item is already selected, remove it
+        selectedPodcastsStore.removeSelected(item)
       } else {
-        return [...prev, id]
+        // Otherwise, add the item to the selected list
+        selectedPodcastsStore.addSelected(item)
       }
-    })
-  }, [])
+    },
+    [selectedPodcastsStore, selectedPodcasts],
+  )
 
   const renderItem = useCallback(
     ({ item }: { item: Podcast }) => (
       <PodcastRenderItem
-        id={item.id}
-        title={item.title}
-        channel={item.channel}
-        imageUrl={item.imageUrl}
-        isSelected={selectedIds.includes(item.id)}
+        item={item}
+        isSelected={selectedPodcasts.some((selectedItem) => selectedItem.id === item.id)}
         onToggleSelect={toggleSelect}
       />
     ),
-    [selectedIds, toggleSelect],
+    [selectedPodcasts, toggleSelect],
   )
+  console.log("podcastSelected", selectedPodcasts)
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -56,10 +61,11 @@ export const PodcastListingScreen = () => {
             showsVerticalScrollIndicator={false}
           />
         </View>
+        <FloatingButton/>
       </View>
     </SafeAreaView>
   )
-}
+})
 
 const styles = StyleSheet.create({
   container: {

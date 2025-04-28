@@ -6,14 +6,8 @@ import { HEIGHT, WIDTH } from "@/constants/dimensions"
 import { colors } from "@/theme"
 import { PodcastItemProps } from "@/types/types"
 
-const PodcastItem = ({
-  id,
-  title,
-  channel,
-  imageUrl,
-  isSelected,
-  onToggleSelect,
-}: PodcastItemProps) => {
+const PodcastItem = ({ item, isSelected, onToggleSelect }: PodcastItemProps) => {
+  const { title, channel, imageUrl } = item
   return (
     <View style={styles.container}>
       <FastImage
@@ -27,7 +21,7 @@ const PodcastItem = ({
       </View>
       <TouchableOpacity
         style={[styles.button, isSelected ? styles.selectedButton : styles.defaultButton]}
-        onPress={() => onToggleSelect(id)}
+        onPress={onToggleSelect.bind(null, item)}
       >
         <Text style={isSelected ? styles.selectedButtonText : styles.unSelectedButtonText}>
           {isSelected ? "Selected" : "Subscribe"}
@@ -45,7 +39,7 @@ const styles = StyleSheet.create({
     paddingVertical: HEIGHT * 0.014,
   },
   channel: {
-    color: "gray",
+    color: colors.textGrey,
     fontSize: 14,
     marginTop: HEIGHT * 0.007,
   },
@@ -67,7 +61,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.selected,
   },
   selectedButtonText: {
-    color: colors.black,
+    color: colors.primary,
     fontSize: 15,
     fontWeight: "600",
   },
