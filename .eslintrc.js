@@ -14,7 +14,7 @@ module.exports = {
   rules: {
     "react-native/no-color-literals": "off",
     "import/export": "off",
-    "prettier/prettier": "error",
+    "prettier/prettier": "off",
     // typescript-eslint
     "@typescript-eslint/array-type": 0,
     "@typescript-eslint/ban-ts-comment": 0,

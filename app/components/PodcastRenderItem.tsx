@@ -1,6 +1,8 @@
-import { memo, useRef } from "react";
+import { memo, useCallback, useRef } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from "react-native";
 import FastImage from "react-native-fast-image";
+import debounce from 'lodash/debounce';
+
 
 import { HEIGHT, WIDTH } from "@/constants/dimensions";
 import { colors } from "@/theme";
@@ -18,13 +20,17 @@ const PodcastItem = ({ item, isSelected, onToggleSelect, remove }: PodcastItemPr
         duration: 500, 
         useNativeDriver: true,
       }).start(() => {
-        onToggleSelect(item); 
+        debouncedToggleSelect(item)
       });
     } else {
-      onToggleSelect(item);
+      debouncedToggleSelect(item)
     }
   };
-
+  const debouncedToggleSelect = useCallback(
+    debounce((item) => onToggleSelect(item), 100),
+    [onToggleSelect]
+  );
+  
   return (
     <Animated.View style={[styles.container, { transform: [{ scaleY: animatedHeight }] }]}>
       <FastImage
