@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Text, StyleSheet, Pressable } from "react-native";
+import { Text, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -7,62 +7,70 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { HEIGHT, WIDTH } from "@/constants/dimensions";
-import { useStores } from "@/models";
 import { colors } from "@/theme";
 import { observer } from "mobx-react-lite";
+import { Pressable } from "react-native";
+import { useStores } from "@/models";
 
 interface FloatingButtonProps {
   onClickShowPodCast: () => void;
+  isVisible: boolean;
 }
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-const FloatingButton = observer(({ onClickShowPodCast }: FloatingButtonProps) => {
+const FloatingButton = observer(({ onClickShowPodCast, isVisible }: FloatingButtonProps) => {
   const { selectedPodcastsStore } = useStores();
   const podcastCount = selectedPodcastsStore.selectedCount;
 
   // Animation values
   const translateY = useSharedValue(100);
   const opacity = useSharedValue(0);
-  const isVisible = useSharedValue(false);
+  const scale = useSharedValue(0.9);
 
-  // Update visibility based on podcastCount
   useEffect(() => {
-    if (podcastCount > 0) {
-      isVisible.value = true;
+    if (isVisible) {
       translateY.value = withTiming(0, {
-        duration: 500,
+        duration: 300,
         easing: Easing.out(Easing.ease),
       });
       opacity.value = withTiming(1, {
-        duration: 500,
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      });
+      scale.value = withTiming(1, {
+        duration: 300,
         easing: Easing.out(Easing.ease),
       });
     } else {
-      isVisible.value = false;
       translateY.value = withTiming(100, {
-        duration: 500,
-        easing: Easing.out(Easing.ease),
+        duration: 300,
+        easing: Easing.in(Easing.ease),
       });
       opacity.value = withTiming(0, {
-        duration: 500,
-        easing: Easing.out(Easing.ease),
+        duration: 300,
+        easing: Easing.in(Easing.ease),
+      });
+      scale.value = withTiming(0.9, {
+        duration: 300,
+        easing: Easing.in(Easing.ease),
       });
     }
-  }, [podcastCount]);
+  }, [isVisible]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
+    transform: [
+      { translateY: translateY.value },
+      { scale: scale.value }
+    ],
     opacity: opacity.value,
     backgroundColor: podcastCount > 0 ? colors.selected : colors.textGrey,
   }));
 
   return (
-    <AnimatedPressable onPress={onClickShowPodCast}>
+    <Pressable onPress={onClickShowPodCast}>
       <Animated.View style={[styles.buttonContainer, animatedStyle]}>
         <Text style={styles.buttonText}>Show Added ({podcastCount})</Text>
       </Animated.View>
-    </AnimatedPressable>
+    </Pressable>
   );
 });
 
@@ -78,7 +86,7 @@ const styles = StyleSheet.create({
     paddingVertical: HEIGHT * 0.025,
     position: "absolute",
     right: WIDTH * 0.05,
-    shadowColor: 'rgba(242, 244, 238, 0.9)',
+    shadowColor: 'rgba(185, 190, 177, 0.9)',
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 1,
     shadowRadius: 20,

@@ -116,18 +116,6 @@ const SelectedPodcastsBottomSheet = observer(({ visible, onClose }: BottomSheetP
     [selectedPodcastsStore]
   );
 
-  const renderItem = useCallback(
-    ({ item }: { item: Podcast }) => (
-      <PodcastRenderItem
-        item={item}
-        remove={true}
-        isSelected={selectedPodcasts.some((selectedItem) => selectedItem.id === item.id)}
-        onToggleSelect={handleRemove}
-      />
-    ),
-    [selectedPodcasts, handleRemove]
-  );
-
   if (!visible && !isAnimating.value) return null;
 
   return (
