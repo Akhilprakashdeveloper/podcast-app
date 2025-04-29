@@ -29,7 +29,10 @@ const PodcastItem = ({ item, isSelected, onToggleSelect, remove }: PodcastItemPr
     <Animated.View style={[styles.container, { transform: [{ scaleY: animatedHeight }] }]}>
       <FastImage
         style={styles.image}
-        source={{ uri: imageUrl }}
+        source={{
+          uri: imageUrl,
+          cache: FastImage.cacheControl.immutable //caching image
+        }}
         resizeMode={FastImage.resizeMode.cover}
       />
       <View style={styles.textContainer}>

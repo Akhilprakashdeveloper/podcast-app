@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { StyleSheet, View, TouchableWithoutFeedback, FlatList, Text } from "react-native";
+import { StyleSheet, View, TouchableWithoutFeedback, Text } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -9,7 +9,7 @@ import Animated, {
   Easing,
   useAnimatedGestureHandler,
 } from "react-native-reanimated";
-import { PanGestureHandler, GestureHandlerRootView } from "react-native-gesture-handler";
+import { PanGestureHandler, GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 import { HEIGHT, WIDTH } from "@/constants/dimensions";
 import { colors } from "@/theme";
 import { useStores } from "@/models";
@@ -145,22 +145,29 @@ const SelectedPodcastsBottomSheet = observer(({ visible, onClose }: BottomSheetP
             <View style={styles.titleContainer}>
               {podcastCount > 0 && <Text style={styles.header}>Selected Podcasts</Text>}
             </View>
-            <View style={{ paddingBottom: HEIGHT * 0.3 }}>
-              <FlatList
-                data={selectedPodcasts}
-                keyExtractor={(item) => item.id}
-                renderItem={renderItem}
-                initialNumToRender={10}
-                maxToRenderPerBatch={10}
-                windowSize={5}
-                showsVerticalScrollIndicator={false}
-                ListEmptyComponent={
-                  <View style={styles.emptyContainer}>
-                    <Text style={styles.emptyText}>Podcast Selection Not Available</Text>
-                  </View>
-                }
-              />
-            </View>
+            
+            <ScrollView 
+            showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: HEIGHT * 0.35 }}
+              scrollEventThrottle={16}
+              bounces={false}
+            >
+              {selectedPodcasts.length > 0 ? (
+                selectedPodcasts.map((item) => (
+                  <PodcastRenderItem
+                    key={item.id}
+                    item={item}
+                    remove={true}
+                    isSelected={selectedPodcasts.some((selectedItem) => selectedItem.id === item.id)}
+                    onToggleSelect={handleRemove}
+                  />
+                ))
+              ) : (
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyText}>Podcast Selection Not Available</Text>
+                </View>
+              )}
+            </ScrollView>
           </Animated.View>
         </PanGestureHandler>
       </>
@@ -177,9 +184,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: colors.darkGrey,
     borderRadius: 2.5,
-    height: 5,
-    marginBottom: 10,
-    width: 40,
+    height: HEIGHT*0.005,
+    marginBottom: HEIGHT*0.025,
+    width: WIDTH*0.1,
   },
   emptyContainer: {
     alignItems: 'center',
@@ -203,7 +210,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     bottom: 0,
-    height: HEIGHT * 0.8,
+    height: HEIGHT * 0.85,
     left: 0,
     paddingHorizontal: WIDTH * 0.05,
     paddingTop: HEIGHT * 0.02,
