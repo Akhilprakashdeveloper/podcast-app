@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import { FlatList, SafeAreaView, Text, View, StyleSheet } from "react-native"
 
 import PodcastRenderItem from "@/components/PodcastRenderItem"
@@ -8,25 +8,26 @@ import { colors } from "@/theme"
 import { useStores } from "@/models"
 import { observer } from "mobx-react-lite"
 import FloatingButton from "@/components/FloatingButton"
+import SelectedPodcastsBottomSheet from "@/components/SelectedPodcastsBottomSheet"
 
 const dummyPodcasts: Podcast[] = new Array(120).fill(null).map((_, index) => ({
   id: `podcast-${index}`,
   title: `Podcast Title ${index + 1}`,
   channel: `Channel ${index + 1}`,
-  imageUrl: "https://picsum.photos/200", // Loading from remote url
+  imageUrl: "https://picsum.photos/200",
 }))
 
 export const PodcastListingScreen = observer(() => {
   const { selectedPodcastsStore } = useStores()
   const selectedPodcasts = selectedPodcastsStore.selectedPodcasts
 
+  const [isBottomSheetVisible, setBottomSheetVisible] = useState<boolean>(false);
+
   const toggleSelect = useCallback(
     (item: Podcast) => {
       if (selectedPodcasts.some((selectedItem) => selectedItem.id === item.id)) {
-        // If the item is already selected, remove it
         selectedPodcastsStore.removeSelected(item)
       } else {
-        // Otherwise, add the item to the selected list
         selectedPodcastsStore.addSelected(item)
       }
     },
@@ -61,7 +62,11 @@ export const PodcastListingScreen = observer(() => {
             showsVerticalScrollIndicator={false}
           />
         </View>
-        <FloatingButton/>
+        <FloatingButton onClickShowPodCast={() => setBottomSheetVisible(true)} />
+        <SelectedPodcastsBottomSheet
+          visible={isBottomSheetVisible}
+          onClose={() => setBottomSheetVisible(false)}
+        />
       </View>
     </SafeAreaView>
   )

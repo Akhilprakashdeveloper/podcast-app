@@ -1,15 +1,32 @@
-import { memo } from "react"
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
-import FastImage from "react-native-fast-image"
+import { memo, useRef } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from "react-native";
+import FastImage from "react-native-fast-image";
 
-import { HEIGHT, WIDTH } from "@/constants/dimensions"
-import { colors } from "@/theme"
-import { PodcastItemProps } from "@/types/types"
+import { HEIGHT, WIDTH } from "@/constants/dimensions";
+import { colors } from "@/theme";
+import { PodcastItemProps } from "@/types/types";
 
-const PodcastItem = ({ item, isSelected, onToggleSelect }: PodcastItemProps) => {
-  const { title, channel, imageUrl } = item
+const PodcastItem = ({ item, isSelected, onToggleSelect, remove }: PodcastItemProps) => {
+  const { title, channel, imageUrl } = item;
+  
+  const animatedHeight = useRef(new Animated.Value(1)).current;
+
+  const handlePress = () => {
+    if (remove) {
+      Animated.timing(animatedHeight, {
+        toValue: 0, 
+        duration: 500, 
+        useNativeDriver: true,
+      }).start(() => {
+        onToggleSelect(item); 
+      });
+    } else {
+      onToggleSelect(item);
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, { transform: [{ scaleY: animatedHeight }] }]}>
       <FastImage
         style={styles.image}
         source={{ uri: imageUrl }}
@@ -20,16 +37,23 @@ const PodcastItem = ({ item, isSelected, onToggleSelect }: PodcastItemProps) => 
         <Text style={styles.channel}>{channel}</Text>
       </View>
       <TouchableOpacity
-        style={[styles.button, isSelected ? styles.selectedButton : styles.defaultButton]}
-        onPress={onToggleSelect.bind(null, item)}
+        style={[
+          styles.button,
+          remove
+            ? styles.removeButtonStyle
+            : isSelected
+            ? styles.selectedButton
+            : styles.defaultButton,
+        ]}
+        onPress={handlePress}
       >
         <Text style={isSelected ? styles.selectedButtonText : styles.unSelectedButtonText}>
-          {isSelected ? "Selected" : "Subscribe"}
+          {remove ? "Remove" : isSelected ? "Selected" : "Subscribe"}
         </Text>
       </TouchableOpacity>
-    </View>
-  )
-}
+    </Animated.View>
+  );
+};
 
 const styles = StyleSheet.create({
   button: {
@@ -54,8 +78,10 @@ const styles = StyleSheet.create({
   image: {
     borderRadius: 10,
     height: HEIGHT * 0.08,
-    resizeMode: "contain",
     width: WIDTH * 0.18,
+  },
+  removeButtonStyle: {
+    backgroundColor: colors.lighterRed,
   },
   selectedButton: {
     backgroundColor: colors.selected,
@@ -79,7 +105,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
   },
-})
+});
 
-// Memoize to prevent unnecessary re-renders
-export default memo(PodcastItem)
+export default memo(PodcastItem);

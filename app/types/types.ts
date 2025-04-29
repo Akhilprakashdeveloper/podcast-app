@@ -8,4 +8,5 @@ export interface PodcastItemProps {
   item: Podcast
   isSelected: boolean
   onToggleSelect: (item: Podcast) => void
+  remove?:boolean
 }
